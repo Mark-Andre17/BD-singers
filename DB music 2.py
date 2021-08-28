@@ -7,9 +7,9 @@ engine = sqlalchemy.create_engine(f'postgresql://postgres:{my_pass}@localhost:54
 c = engine.connect()
 singers = c.execute("""SELECT genre_id, COUNT(singer_id) FROM singer_genre GROUP BY genre_id;""").fetchmany(10)
 # print(singers)
-track = c.execute("""SELECT COUNT(id) FROM song 
-                     WHERE album_id IN (SELECT id FROM album 
-                     WHERE year BETWEEN 2019 AND 2020);""").fetchmany(10)
+track = c.execute("""SELECT COUNT(s.id) FROM song s
+                     JOIN album a ON a.id = s.album_id
+                     WHERE a.year BETWEEN 2019 AND 2020;""").fetchmany(10)
 # print(track)
 avr_duration = c.execute("""SELECT a.name_album, AVG(duration) FROM song s JOIN album a ON s.album_id = a.id GROUP BY 
 a.name_album;""").fetchmany(10)
@@ -44,8 +44,12 @@ min_duration = c.execute("""SELECT s.name_singer FROM singer s
                             JOIN song so ON so.album_id = a.id
                             WHERE duration = (SELECT min(duration) FROM song);""").fetchmany(10)
 # print(min_duration)
-album = c.execute("""SELECT a.name_album,COUNT(s.id) FROM album a
+album = c.execute("""SELECT DISTINCT a.name_album FROM album a
                      JOIN song s ON s.album_id = a.id
-                     GROUP BY name_album
-                     ORDER BY COUNT(s.id);""").fetchmany(10)
+                     WHERE s.album_id IN(SELECT album_id FROM song
+                     GROUP BY album_id
+                     HAVING COUNT(id)=(SELECT COUNT(id) FROM song
+                     GROUP BY album_id
+                     ORDER BY COUNT
+                     LIMIT 1));""").fetchmany(10)
 # print(album)
