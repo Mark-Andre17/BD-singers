@@ -77,14 +77,13 @@ connection.execute("""INSERT INTO song_collection(id,song_id,song,collection_id)
                                                                 (15,15,'Let my people go',6);""")
 # SELECT
 name_year = connection.execute("""SELECT name_album,year FROM album WHERE year = 2018;""").fetchmany(10)
-# print(name_year)
+
 duration = connection.execute("""SELECT name_song,duration FROM song ORDER BY duration DESC;""").fetchone()
-# print(duration)
+
 name_songs = connection.execute("""SELECT name_song FROM song WHERE duration >= 3.5;""").fetchmany(10)
-# print(name_songs)
+
 collections = connection.execute("""SELECT name_collection FROM music_collection WHERE year BETWEEN 2018 AND 2020;""").fetchmany(10)
-# print(collections)
+
 a = connection.execute("""SELECT name_singer FROM singer WHERE name_singer NOT LIKE '%% %%';""").fetchmany(10)
-# print(a)
+
 track = connection.execute("""SELECT name_song FROM song WHERE name_song LIKE '%%My%%' OR name_song LIKE '%%мой%%';""").fetchmany(10)
-# print(track)
